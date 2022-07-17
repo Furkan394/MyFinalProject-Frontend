@@ -1,7 +1,9 @@
+import { CartService } from './../../services/cart.service';
 import { Product } from './../../models/product';
 import { Component, OnInit } from '@angular/core';
 import { ProductService } from 'src/app/services/product.service';
 import { ActivatedRoute } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-product',
@@ -12,9 +14,11 @@ export class ProductComponent implements OnInit {
 
   products:Product[] = [];
   dataLoaded = false;
-
+  filterText="";
   constructor(private productService:ProductService,
-              private activatedRoute:ActivatedRoute) { }
+              private activatedRoute:ActivatedRoute,
+              private toastrService:ToastrService,
+              private cartService:CartService) { }
 
   ngOnInit(): void {
     this.activatedRoute.params.subscribe(params=>{
@@ -40,4 +44,12 @@ export class ProductComponent implements OnInit {
     });
   }
 
+  addToCart(product:Product){
+    if (product.unitsInStock===0) {
+      this.toastrService.error("This product is out of stock")
+    }else{
+      this.toastrService.success(product.productName + " added to cart");
+      this.cartService.addToCart(product);
+    }
+  }
 }
